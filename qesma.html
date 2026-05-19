@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>منصة الأستاذ أحمد أبو جبل التعليمية - مهارة القسمة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* خلفية رملية دافئة وفاخرة */
+            background: linear-gradient(135deg, #e7d8c9 0%, #b89f81 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .app-container {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 70px rgba(92, 73, 50, 0.3);
+            padding: 24px;
+            width: 100%;
+            max-width: 650px;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cfb99f;
+        }
+
+        @keyframes goldGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .gold-watermark {
+            position: relative;
+        }
+        
+        .gold-watermark::before {
+            content: "أحمد أبو جبل   أحمد أبو جبل   أحمد أبو جبل\A أحمد أبو جبل   أحمد أبو جبل   أحمد أبو جبل\A أحمد أبو جبل   أحمد أبو جبل   أحمد أبو جبل\A أحمد أبو جبل   أحمد أبو جبل   أحمد أبو جبل";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            width: 200%;
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 4;
+            text-align: center;
+            white-space: pre-line;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(90deg, #b8860b, #e6ca65, #996515, #e6ca65, #b8860b);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.14; 
+            animation: goldGlow 12s ease infinite;
+        }
+
+        #welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            z-index: 10;
+            text-align: center;
+        }
+
+        /* تكبير خطوط الشاشات والترحيب */
+        .welcome-title { font-size: 28px; color: #4a3728; font-weight: 900; margin-bottom: 12px; }
+        .welcome-subtitle { font-size: 22px; color: #78593e; font-weight: 700; margin-bottom: 35px; }
+
+        .start-btn {
+            width: 100%; max-width: 340px; padding: 18px; font-size: 22px; font-weight: 700; border: none;
+            border-radius: 16px; cursor: pointer; box-shadow: 0 6px 20px rgba(120, 89, 62, 0.3);
+            color: white; background: linear-gradient(135deg, #8c6d53, #b89f81); transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        .start-btn:active { transform: scale(0.98); }
+
+        .live-metrics-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #4a3728; /* لون متناسق مع البيئة الرملية */
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .metric-badge { padding: 4px 12px; border-radius: 8px; font-size: 16px; font-weight: 800; display: inline-block; }
+        .metric-success { background: #1e4620; color: #a3cfbb; }
+        .metric-danger { background: #721c24; color: #f8d7da; }
+        .metric-percent { background: #1b3a4b; color: #9ad2ff; }
+
+        .header { text-align: center; margin-bottom: 12px; z-index: 5; }
+        .header h1 { color: #2d221a; font-size: 24px; font-weight: 900; }
+
+        .math-layout-wrapper {
+            background: rgba(253, 251, 247, 0.96);
+            border-radius: 20px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            margin-bottom: 18px;
+            border: 2px solid #e1d5c1;
+            min-height: 180px;
+        }
+
+        /* تكبير خط المسألة الحسابية بشكل ملحوظ */
+        .question-text {
+            font-size: 54px;
+            font-weight: 900;
+            color: #1a1510;
+            text-align: center;
+            letter-spacing: 2px;
+            z-index: 5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            width: 100%;
+            z-index: 10;
+            margin-bottom: 5px;
+        }
+
+        /* تكبير خط أزرار الاختيارات وتعديل مظهرها */
+        .option-btn {
+            background: #ffffff;
+            border: 3px solid #dcd1be;
+            border-radius: 18px;
+            padding: 18px;
+            font-size: 34px;
+            font-weight: 900;
+            color: #3e3227;
+            cursor: pointer;
+            box-shadow: 0 5px 8px rgba(0,0,0,0.04);
+            transition: background 0.1s ease, border-color 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-appearance: none;
+        }
+
+        .option-correct {
+            background: #e8f5e9 !important;
+            border-color: #2e7d32 !important;
+            color: #1b5e20 !important;
+            box-shadow: 0 0 15px rgba(46, 125, 50, 0.4) !important;
+        }
+
+        .option-wrong {
+            background: #ffebee !important;
+            border-color: #c62828 !important;
+            color: #b71c1c !important;
+            animation: shake 0.3s ease-in-out;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .overlay-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; justify-content: center;
+            align-items: center; padding: 20px; z-index: 100; text-align: center;
+        }
+        #success-screen { background: rgba(252, 249, 242, 0.98); }
+        #report-screen { background: rgba(253, 251, 247, 0.99); }
+
+        .screen-title { font-size: 26px; font-weight: 800; margin-bottom: 15px; }
+        .success-title { color: #2e7d32; }
+
+        .report-card {
+            background: #ffffff; border-radius: 20px; padding: 20px; width: 100%;
+            max-width: 450px; box-shadow: 0 12px 35px rgba(0,0,0,0.06); margin-bottom: 25px; text-align: right;
+            border: 1px solid #e1d5c1;
+        }
+        .report-item {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 18px; font-weight: 700; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px dashed #dcd1be;
+            color: #4a3728;
+        }
+        .report-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .action-btn {
+            padding: 16px 36px; font-size: 18px; font-weight: 700; border: none;
+            border-radius: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+            background: #2e7d32; color: white;
+            -webkit-appearance: none;
+        }
+
+        @media (max-width: 380px) {
+            .app-container { padding: 14px; }
+            .question-text { font-size: 40px; }
+            .option-btn { padding: 14px; font-size: 28px; border-radius: 14px; }
+            .live-metrics-bar { font-size: 13px; padding: 10px; }
+            .metric-badge { font-size: 13px; padding: 2px 8px; }
+            .welcome-title { font-size: 22px; }
+            .screen-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div id="welcome-screen" class="gold-watermark">
+            <div class="welcome-title">منصة الأستاذ أحمد أبو جبل الرقمية</div>
+            <div class="welcome-subtitle">مهارة القسمة (٤٠ سؤالاً - المقسوم عليه لا يتعدى ١٢)</div>
+            <button class="start-btn" onclick="startDivisionQuiz()">ابدأ الاختبار الآن ➗</button>
+        </div>
+
+        <div class="overlay-screen gold-watermark" id="success-screen">
+            <div style="font-size: 55px; margin-bottom: 10px;">🌟✨👏</div>
+            <div class="screen-title success-title">إجابة صحيحة ومتقنة تماماً بارك الله فيك!</div>
+            <button class="action-btn" onclick="loadNextQuestion()">السؤال التالي 🚀</button>
+        </div>
+
+        <div class="overlay-screen gold-watermark" id="report-screen">
+            <div style="font-size: 50px; margin-bottom: 5px;">📊</div>
+            <div class="screen-title" style="color:#2d221a;">التقرير الختامي للمهارة</div>
+            <div id="report-card-container"></div>
+            <button class="action-btn" style="background:#4a3728;" onclick="resetToMainMenu()">إعادة الاختبار 🔄</button>
+        </div>
+
+        <div class="live-metrics-bar" id="live-metrics-bar" style="display: none;">
+            <div>السؤال: <span id="live-qnum" style="color:#facc15;">٠ / ٤٠</span></div>
+            <div>صحيح: <span id="live-correct" class="metric-badge metric-success">٠</span></div>
+            <div>أخطاء: <span id="live-wrong" class="metric-badge metric-danger">٠</span></div>
+            <div>النسبة: <span id="live-ratio" class="metric-badge metric-percent">٠%</span></div>
+        </div>
+
+        <div class="header" id="main-header" style="display: none;">
+            <h1>مُنصة الأستاذ أحمد أبو جبل لمهارات القسمة</h1>
+        </div>
+
+        <div class="math-layout-wrapper" id="main-layout-wrapper" style="display: none;">
+            <div class="question-text" id="question-display-box"></div>
+        </div>
+
+        <div class="options-grid" id="options-container" style="display: none;"></div>
+
+    </div>
+
+    <script>
+        const hindiDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+        let questionsBank = [];
+        let currentIndex = 0;
+
+        let scoreFirstAttempt = 0;
+        let errorCounter = 0;
+        let currentQuestionHasError = false;
+
+        let audioCtx = null;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function convertToHindiStr(num) {
+            if (num === null || num === undefined) return '';
+            return num.toString().split('').map(char => {
+                let idx = englishDigits.indexOf(char);
+                return idx !== -1 ? hindiDigits[idx] : char;
+            }).join('');
+        }
+
+        function startDivisionQuiz() {
+            initAudioContext();
+
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('live-metrics-bar').style.display = 'flex';
+            document.getElementById('main-header').style.display = 'block';
+            document.getElementById('main-layout-wrapper').style.display = 'flex';
+            document.getElementById('options-container').style.display = 'grid';
+
+            currentIndex = 0;
+            scoreFirstAttempt = 0;
+            errorCounter = 0;
+
+            generateStrictDivisionBank();
+            updateLiveMetrics();
+            displayCurrentQuestion();
+        }
+
+        function generateStrictDivisionBank() {
+            questionsBank = [];
+            let tracker = new Set();
+
+            // ١. قسمة الصفر (٥ أسئلة) والمقسوم عليه من ٢ إلى ١٢
+            while(questionsBank.length < 5) {
+                let dsor = Math.floor(Math.random() * 11) + 2; 
+                let key = `0÷${dsor}`;
+                if(!tracker.has(key)) {
+                    tracker.add(key);
+                    questionsBank.push({ dividend: 0, divisor: dsor, quotient: 0 });
+                }
+            }
+
+            // ٢. قسمة العدد على نفسه (٥ أسئلة) والمقسوم عليه من ٢ إلى ١٢
+            while(questionsBank.length < 10) {
+                let dsor = Math.floor(Math.random() * 11) + 2; 
+                let key = `${dsor}÷${dsor}`;
+                if(!tracker.has(key)) {
+                    tracker.add(key);
+                    questionsBank.push({ dividend: dsor, divisor: dsor, quotient: 1 });
+                }
+            }
+
+            // ٣. القسمة على واحد (٥ أسئلة) والناتج لا يتعدى ١٢
+            while(questionsBank.length < 15) {
+                let q = Math.floor(Math.random() * 11) + 2; 
+                let key = `${q}÷1`;
+                if(!tracker.has(key)) {
+                    tracker.add(key);
+                    questionsBank.push({ dividend: q, divisor: 1, quotient: q });
+                }
+            }
+
+            // ٤. مسائل عامة (٢٥ سؤالاً) بحيث المقسوم عليه من ٢ إلى ١٢ والناتج من ٢ إلى ١٢
+            let generalPool = [];
+            for (let q = 2; q <= 12; q++) { 
+                for (let d = 2; d <= 12; d++) { 
+                    let dividend = d * q;
+                    let key = `${dividend}÷${d}`;
+                    if (!tracker.has(key)) {
+                        generalPool.push({ dividend: dividend, divisor: d, quotient: q, key: key });
+                    }
+                }
+            }
+
+            generalPool.sort(() => Math.random() - 0.5);
+            
+            for (let item of generalPool) {
+                if (questionsBank.length >= 40) break;
+                questionsBank.push({ dividend: item.dividend, divisor: item.divisor, quotient: item.quotient });
+            }
+
+            questionsBank.sort(() => Math.random() - 0.5);
+        }
+
+        function updateLiveMetrics() {
+            let percentage = currentIndex === 0 ? 0 : Math.round((scoreFirstAttempt / 40) * 100);
+            document.getElementById('live-qnum').textContent = `${convertToHindiStr(currentIndex + 1)} / ${convertToHindiStr(40)}`;
+            document.getElementById('live-correct').textContent = convertToHindiStr(scoreFirstAttempt);
+            document.getElementById('live-wrong').textContent = convertToHindiStr(errorCounter);
+            document.getElementById('live-ratio').textContent = `${convertToHindiStr(percentage)}%`;
+        }
+
+        function displayCurrentQuestion() {
+            currentQuestionHasError = false;
+            document.getElementById('success-screen').style.display = 'none';
+
+            if (currentIndex >= 40) {
+                renderFinalMasteryReport();
+                return;
+            }
+
+            updateLiveMetrics();
+
+            let currentQuestion = questionsBank[currentIndex];
+            const qBox = document.getElementById('question-display-box');
+            qBox.textContent = `${convertToHindiStr(currentQuestion.dividend)} ÷ ${convertToHindiStr(currentQuestion.divisor)} = ؟`;
+
+            renderSixOptions(currentQuestion.quotient);
+        }
+
+        function renderSixOptions(correctAnswer) {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            let optionsSet = new Set();
+            optionsSet.add(correctAnswer);
+
+            while (optionsSet.size < 6) {
+                let offset = Math.floor(Math.random() * 7) - 3;
+                let fakeAnswer = correctAnswer + offset;
+                
+                if (fakeAnswer >= 0 && fakeAnswer <= 15 && fakeAnswer !== correctAnswer) {
+                    optionsSet.add(fakeAnswer);
+                } else {
+                    let randomFake = Math.floor(Math.random() * 13);
+                    optionsSet.add(randomFake);
+                }
+            }
+
+            let finalOptionsArray = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+            finalOptionsArray.forEach(option => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = convertToHindiStr(option);
+                btn.onclick = () => handleOptionSelection(btn, option, correctAnswer);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleOptionSelection(selectedButton, selectedVal, correctVal) {
+            initAudioContext();
+
+            if (selectedVal === correctVal) {
+                selectedButton.classList.add('option-correct');
+                playSuccessToneShort(); // تشغيل الصوت القصير الفوري للجواب الصحيح
+
+                const allButtons = document.querySelectorAll('.option-btn');
+                allButtons.forEach(b => b.style.pointerEvents = 'none');
+
+                if (!currentQuestionHasError) {
+                    scoreFirstAttempt++;
+                }
+
+                setTimeout(() => {
+                    document.getElementById('success-screen').style.display = 'flex';
+                }, 350);
+
+            } else {
+                if (!selectedButton.classList.contains('option-wrong')) {
+                    selectedButton.classList.add('option-wrong');
+                    currentQuestionHasError = true;
+                    errorCounter++;
+                    updateLiveMetrics();
+                    playIntermittentWarningBeeps();
+                }
+            }
+        }
+
+        function playIntermittentWarningBeeps() {
+            try {
+                if (!audioCtx) return;
+                
+                const beep = (delay, duration) => {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(190, audioCtx.currentTime + delay);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + delay);
+                    gain.gain.setValueAtTime(0.01, audioCtx.currentTime + delay + duration - 0.02);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + delay);
+                    osc.stop(audioCtx.currentTime + delay + duration);
+                };
+
+                beep(0, 0.08);
+                beep(0.14, 0.08);
+                beep(0.28, 0.08);
+            } catch (e) { console.log(e); }
+        }
+
+        // تقصير نغمة النجاح لتكون خاطفة جداً وأقل من ثانية (0.06 ثانية فقط) لتسريع الأداء
+        function playSuccessToneShort() {
+            try {
+                if (!audioCtx) return;
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine'; 
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // نغمة D5 واضحة ومبهجة
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0, audioCtx.currentTime + 0.05);
+                osc.start(); 
+                osc.stop(audioCtx.currentTime + 0.06);
+            } catch(e) {}
+        }
+
+        document.addEventListener('click', function() {
+            initAudioContext();
+        }, { once: true });
+
+        function loadNextQuestion() {
+            currentIndex++;
+            displayCurrentQuestion();
+        }
+
+        function renderFinalMasteryReport() {
+            document.getElementById('live-metrics-bar').style.display = 'none';
+            document.getElementById('main-header').style.display = 'none';
+            document.getElementById('main-layout-wrapper').style.display = 'none';
+            document.getElementById('options-container').style.display = 'none';
+
+            const finalPercentage = Math.round((scoreFirstAttempt / 40) * 100);
+            let masteryStatus = finalPercentage >= 90 ? "🏆 تم تحقيق معيار الإتقان الأكاديمي بنجاح باهر!" : "🎯 المهارة تحتاج إلى خطة تعزيز ومراجعة مستمرة.";
+
+            document.getElementById('report-card-container').innerHTML = `
+                <div class="report-card">
+                    <div class="report-item">
+                        <span>الإجابات الصحيحة (المحاولة الأولى):</span>
+                        <span style="color:#2e7d32; font-size:19px;">${convertToHindiStr(scoreFirstAttempt)} / ٤٠</span>
+                    </div>
+                    <div class="report-item">
+                        <span>إجمالي الأخطاء المرصودة:</span>
+                        <span style="color:#c62828; font-size:19px;">${convertToHindiStr(errorCounter)}</span>
+                    </div>
+                    <div class="report-item" style="background:#fdfbf7; padding:12px; border-radius:12px; margin-top:15px; border-right:5px solid #4a3728;">
+                        <span style="color:#3e3227;">النسبة المئوية الإجمالية للإتقان:</span>
+                        <span style="font-size:26px; font-weight:900; color:#4a3728;">${convertToHindiStr(finalPercentage)}%</span>
+                    </div>
+                    <p style="text-align:center; font-weight:800; margin-top:15px; color:#5c4932;">${masteryStatus}</p>
+                </div>
+            `;
+            document.getElementById('report-screen').style.display = 'flex';
+        }
+
+        function resetToMainMenu() {
+            document.getElementById('report-screen').style.display = 'none';
+            document.getElementById('welcome-screen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
